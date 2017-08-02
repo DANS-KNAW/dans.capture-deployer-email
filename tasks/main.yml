@@ -1,0 +1,16 @@
+- name: Retrieve e-mail address of deployer
+  become: no
+  local_action: command git config --global --get user.email
+  register: deployer_captured_email
+  ignore_errors: True
+
+- debug:
+    msg: "WARNING: the git global variable user.email could not be found, using default e-mail address {{ deployer_email }}"
+  when: deployer_captured_email.rc != 0
+
+- set_fact:
+    deployer_email: "{{ deployer_captured_email.stdout }}"
+  when: deployer_captured_email.rc == 0
+
+- debug:
+    msg: "deployer_email is {{ deployer_email }}"
